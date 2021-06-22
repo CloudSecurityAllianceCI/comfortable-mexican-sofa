@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: ['2.7', '2.6', '2.6', '2.4', '2.3']
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Do some action caching
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gem-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gem-
+      - name: Set up Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - name: Install bundler
+        run: gem install bundler
+      - name: Run bundler
+        run: bundle install --jobs 4 --retry 3
+      - name: Migrate database
+        run: bundle exec rake db:migrate
+      - name: Run tests
+        run: bundle exec rake test
+      - name: Run system tests
+        run: SKIP_COV=true bundle exec rake test:system
+      - name: Run rubocop
+        run: bundle exec rubocop
