@@ -71,9 +71,9 @@ class ActiveSupport::TestCase
   # Example usage:
   #   assert_has_errors_on @record, :field_1, :field_2
   def assert_has_errors_on(record, *fields)
-    unmatched = record.errors.keys - fields.flatten
+    unmatched = record.errors.attribute_names - fields.flatten
     assert unmatched.blank?, "#{record.class} has errors on '#{unmatched.join(', ')}'"
-    unmatched = fields.flatten - record.errors.keys
+    unmatched = fields.flatten - record.errors.attribute_names
     assert unmatched.blank?, "#{record.class} doesn't have errors on '#{unmatched.join(', ')}'"
   end
 
