@@ -30,7 +30,8 @@ class ComfortableMexicanSofa::Content::Tag::FileLink < ComfortableMexicanSofa::C
     super
 
     options = params.extract_options!
-    @identifier     = params[0]
+
+    @identifier     = primary_key_type.cast(params[0])
     @as             = options["as"] || "url"
     @class          = options["class"]
     @variant_attrs  = options.slice("resize", "gravity", "crop")
@@ -42,7 +43,7 @@ class ComfortableMexicanSofa::Content::Tag::FileLink < ComfortableMexicanSofa::C
 
   # @return [Comfy::Cms::File]
   def file_record
-    @file_record ||= context.site.files.detect { |f| f.id == identifier.to_i }
+    @file_record ||= context.site.files.detect { |f| f.id == @identifier }
   end
 
   # @return [ActiveStorage::Blob]
@@ -56,6 +57,11 @@ class ComfortableMexicanSofa::Content::Tag::FileLink < ComfortableMexicanSofa::C
     file_record.label.presence || file.filename.to_s
   end
 
+  private
+
+  def primary_key_type
+    context.site.files.type_for_attribute(context.site.files.primary_key)
+  end
 end
 
 ComfortableMexicanSofa::Content::Renderer.register_tag(
