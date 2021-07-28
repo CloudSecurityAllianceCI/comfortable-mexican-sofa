@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SKIP_COV: true
     strategy:
       matrix:
         ruby: ['2.7', '2.6', '2.6', '2.4', '2.3']
@@ -26,6 +28,6 @@ jobs:
       - name: Run tests
         run: bundle exec rake test
       - name: Run system tests
-        run: SKIP_COV=true bundle exec rake test:system
+        run: bundle exec rake test:system
       - name: Run rubocop
         run: bundle exec rubocop
