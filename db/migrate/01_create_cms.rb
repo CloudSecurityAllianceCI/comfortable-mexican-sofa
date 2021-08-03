@@ -130,7 +130,8 @@ class CreateCms < ActiveRecord::Migration[5.2]
 
     create_table :comfy_cms_categorizations, id: id_type, force: true do |t|
       t.references :category,    type: id_type, null: false
-      t.references :categorized, type: id_type, null: false, polymorphic: true
+      t.references :categorized, type: id_type, null: false, polymorphic: true,
+        index: { name: 'index_cms_categorizations_on_cat_type_and_cat_id' }
 
       t.index [:category_id, :categorized_type, :categorized_id],
       unique: true,
