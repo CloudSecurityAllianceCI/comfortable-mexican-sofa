@@ -3,9 +3,10 @@ class CreateCms < ActiveRecord::Migration[5.2]
   LIMIT = 16777215
 
   def change
+    id_type = ENV["PRIMARY_KEY_TYPE"] || :bigint
 
     # -- Sites -----------------------------------------------------------------
-    create_table :comfy_cms_sites, force: true do |t|
+    create_table :comfy_cms_sites, id: id_type, force: true do |t|
       t.string :label,        null: false
       t.string :identifier,   null: false
       t.string :hostname,     null: false
@@ -17,9 +18,9 @@ class CreateCms < ActiveRecord::Migration[5.2]
     end
 
     # -- Layouts ---------------------------------------------------------------
-    create_table :comfy_cms_layouts, force: true do |t|
-      t.integer :site_id,     null: false
-      t.integer :parent_id
+    create_table :comfy_cms_layouts, id: id_type, force: true do |t|
+      t.references :site,     type: id_type, null: false
+      t.references :parent,   type: id_type
       t.string  :app_layout
       t.string  :label,       null: false
       t.string  :identifier,  null: false
@@ -34,11 +35,11 @@ class CreateCms < ActiveRecord::Migration[5.2]
     end
 
     # -- Pages -----------------------------------------------------------------
-    create_table :comfy_cms_pages, force: true do |t|
-      t.integer :site_id,         null: false
-      t.integer :layout_id
-      t.integer :parent_id
-      t.integer :target_page_id
+    create_table :comfy_cms_pages, id: id_type, force: true do |t|
+      t.references :site,         type: id_type, null: false
+      t.references :layout,       type: id_type
+      t.references :parent,       type: id_type
+      t.references :target_page,  type: id_type
       t.string  :label,           null: false
       t.string  :slug
       t.string  :full_path,       null: false
@@ -54,22 +55,21 @@ class CreateCms < ActiveRecord::Migration[5.2]
     end
 
     # -- Translations ----------------------------------------------------------
-    create_table :comfy_cms_translations, force: true do |t|
+    create_table :comfy_cms_translations, id: id_type, force: true do |t|
       t.string  :locale,    null: false
-      t.integer :page_id,   null: false
-      t.integer :layout_id
+      t.references :page,   type: id_type, null: false
+      t.references :layout, type: id_type
       t.string  :label,           null: false
       t.text    :content_cache,   limit: LIMIT
       t.boolean :is_published,    null: false, default: true
       t.timestamps
 
-      t.index [:page_id]
       t.index [:locale]
       t.index [:is_published]
     end
 
     # -- Fragments -------------------------------------------------------------
-    create_table :comfy_cms_fragments, force: true do |t|
+    create_table :comfy_cms_fragments, id: id_type, force: true do |t|
       t.references  :record,      polymorphic: true
       t.string      :identifier,  null: false
       t.string      :tag,         null: false, default: "text"
@@ -84,8 +84,8 @@ class CreateCms < ActiveRecord::Migration[5.2]
     end
 
     # -- Snippets --------------------------------------------------------------
-    create_table :comfy_cms_snippets, force: true do |t|
-      t.integer :site_id,     null: false
+    create_table :comfy_cms_snippets, id: id_type, force: true do |t|
+      t.references :site,     type: id_type, null: false
       t.string  :label,       null: false
       t.string  :identifier,  null: false
       t.text    :content,     limit: LIMIT
@@ -97,8 +97,8 @@ class CreateCms < ActiveRecord::Migration[5.2]
     end
 
     # -- Files -----------------------------------------------------------------
-    create_table :comfy_cms_files, force: true do |t|
-      t.integer :site_id,     null: false
+    create_table :comfy_cms_files, id: id_type, force: true do |t|
+      t.references :site,     type: id_type, null: false
       t.string  :label,       null: false, default: ""
       t.text    :description, limit: 2048
       t.integer :position,    null: false, default: 0
@@ -108,9 +108,8 @@ class CreateCms < ActiveRecord::Migration[5.2]
     end
 
     # -- Revisions -------------------------------------------------------------
-    create_table :comfy_cms_revisions, force: true do |t|
-      t.string    :record_type, null: false
-      t.integer   :record_id,   null: false
+    create_table :comfy_cms_revisions, id: id_type, force: true do |t|
+      t.references :record,     type: id_type, polymorphic: true, null: false
       t.text      :data,        limit: LIMIT
       t.datetime  :created_at
 
@@ -119,8 +118,8 @@ class CreateCms < ActiveRecord::Migration[5.2]
     end
 
     # -- Categories ------------------------------------------------------------
-    create_table :comfy_cms_categories, force: true do |t|
-      t.integer :site_id,          null: false
+    create_table :comfy_cms_categories, id: id_type, force: true do |t|
+      t.references :site,          type: id_type, null: false
       t.string  :label,            null: false
       t.string  :categorized_type, null: false
 
@@ -129,10 +128,9 @@ class CreateCms < ActiveRecord::Migration[5.2]
       name:   "index_cms_categories_on_site_id_and_cat_type_and_label"
     end
 
-    create_table :comfy_cms_categorizations, force: true do |t|
-      t.integer :category_id,       null: false
-      t.string  :categorized_type,  null: false
-      t.integer :categorized_id,    null: false
+    create_table :comfy_cms_categorizations, id: id_type, force: true do |t|
+      t.references :category,    type: id_type, null: false
+      t.references :categorized, type: id_type, null: false, polymorphic: true
 
       t.index [:category_id, :categorized_type, :categorized_id],
       unique: true,

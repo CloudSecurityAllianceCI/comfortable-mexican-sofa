@@ -11,10 +11,12 @@ jobs:
       matrix:
         ruby: ['3.0', '2.7', '2.6']
         rails: ['6.0', '6.1']
+        primary_key_type: ['bigint', 'uuid']
     env:
       SKIP_COV: true
       RAILS_VERSION: "~> ${{ matrix.rails }}.0"
-    name: Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }}
+      PRIMARY_KEY_TYPE: ${{ matrix.primary_key_type }}
+    name: Ruby ${{ matrix.ruby }} / Rails ${{ matrix.rails }} / ${{ matrix.primary_key_type }}
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
