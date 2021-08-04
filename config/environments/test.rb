@@ -45,10 +45,6 @@ defined?(ComfortableMexicanSofa::Application) && ComfortableMexicanSofa::Applica
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  config.active_job.queue_adapter = :inline
-
-  config.i18n.raise_on_missing_translations = true
-
   # TODO: This is temporary fix so TravisCI runs until Rails 5.2.3 is out.
   # See: https://github.com/rails/rails/pull/35607
   config.secret_key_base = SecureRandom.hex(64)

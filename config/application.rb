@@ -35,5 +35,13 @@ module ComfortableMexicanSofa
 
     config.i18n.enforce_available_locales = true
 
+    if Rails.version =~ %r{^6.0}
+      config.action_view.raise_on_missing_translations = true
+    else
+      config.i18n.raise_on_missing_translations = true
+    end
+
+    config.active_job.queue_adapter = :inline
+
   end
 end
