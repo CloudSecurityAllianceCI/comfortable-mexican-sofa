@@ -40,7 +40,7 @@ class ContentTagsFilesTest < ActiveSupport::TestCase
   def test_content
     frag = comfy_cms_fragments(:file)
     frag.update_attribute(:tag, "files")
-    frag.update_attribute(:files, fixture_file_upload("files/image.jpg", "image/jpeg"))
+    frag.update_attribute(:files, fixture_file_upload("image.jpg", "image/jpeg"))
     tag = ComfortableMexicanSofa::Content::Tag::Files.new(context: @page, params: [frag.identifier])
     out = frag.attachments.map { |a| rails_blob_path(a, only_path: true) }.join(" ")
     assert_equal out, tag.content
